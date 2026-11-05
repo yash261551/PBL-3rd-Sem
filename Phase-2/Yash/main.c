@@ -1,15 +1,27 @@
 #include <stdio.h>
-
+#include "coach_management.h"
+#include "database.h"
 #include "seat_management.h"
 #include "passenger.h"
 #include "booking.h"
 #include "cancellation.h"
 #include "waiting_queue.h"
 #include "priority_queue.h"
-
+#define MAX_PASSENGERS 100
 int main()
 {
-    struct Passenger p;
+    struct Passenger passengers[MAX_PASSENGERS];
+    int count = 0;
+
+    if (!initializeDatabase())
+    {
+        printf("Failed to initialize database.\n");
+        return 1;
+    }
+
+    count = loadPassengers(passengers, MAX_PASSENGERS);
+
+    initializeCoaches();
 
     int choice;
     int passengerCreated = 0;
@@ -26,11 +38,10 @@ int main()
         printf("\n1. Add Passenger");
         printf("\n2. Book Ticket");
         printf("\n3. Cancel Ticket");
-        printf("\n4. Display Passenger");
-        printf("\n5. Display Seats");
-        printf("\n6. Display Waiting List");
-        printf("\n7. Display Priority Waiting List");
-        printf("\n8. Exit");
+        printf("\n4. Display All Passengers");
+        printf("\n5. Display Coach Availability");
+        printf("\n6. Display Ticket Prices");
+        printf("\n7. Exit");
 
         printf("\n\nEnter your choice: ");
         scanf("%d", &choice);
@@ -39,24 +50,29 @@ int main()
         {
             case 1:
 
-                inputPassenger(&p);
-
-                passengerCreated = 1;
-
-                printf("\nPassenger added successfully.");
-
+                inputPassenger(&passengers[count]);
+                if (savePassenger(&passengers[count]))
+                {
+                    count++;
+                    printf("\nPassenger added successfully!\n");
+                }
+                else
+                {
+                    printf("\nFailed to save passenger. Please try again.\n");
+                }
                 break;
 
 
             case 2:
 
-                if(passengerCreated == 0)
+                if (count > 0)
                 {
-                    printf("\nPlease add passenger first.");
+                    bookTicket(&passengers[count - 1]);
+                    savePassenger(&passengers[count - 1]);
                 }
                 else
                 {
-                    bookTicket(&p);
+                    printf("Please add a passenger first.\n");
                 }
 
                 break;
@@ -64,45 +80,30 @@ int main()
 
             case 3:
 
-                if(passengerCreated == 0)
+                if (count > 0)
                 {
-                    printf("\nNo passenger available.");
+                    cancelTicket(&passengers[count - 1]);
+                    savePassenger(&passengers[count - 1]);
                 }
                 else
                 {
-                    cancelTicket(&p);
+                    printf("Please add a passenger first.\n");
                 }
-
                 break;
 
 
             case 4:
-
-                if(passengerCreated == 0)
-                {
-                    printf("\nNo passenger available.");
-                }
-                else
-                {
-                    displayPassenger(p);
-                }
-
+                displayAllPassengers(passengers, count);
                 break;
 
 
             case 5:
-
-                displaySeats();
-
+                displayCoachAvailability();
                 break;
-
 
             case 6:
-
-                displayWaitingQueue();
-
+                displayCoaches();
                 break;
-
 
             case 7:
 

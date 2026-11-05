@@ -4,5 +4,5 @@
 #include "passenger.h"
 
 void bookTicket(struct Passenger *p);
-
+void bookTicket(struct Passenger *p);
 #endif

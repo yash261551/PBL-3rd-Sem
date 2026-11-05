@@ -9,9 +9,12 @@ struct Passenger
     int priority;
     int seatNo;
     int status;
+
+    int coachType;
+    float ticketPrice;
 };
 
 void inputPassenger(struct Passenger *p);
 void displayPassenger(struct Passenger p);
-
+void displayAllPassengers(struct Passenger passengers[], int count);
 #endif
