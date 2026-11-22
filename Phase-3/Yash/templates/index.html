@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RailConnect | Railway Management System</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root {
+    --bg:#080f20;
+    --panel:#111d34;
+    --panel2:#172642;
+    --border:rgba(255,255,255,.08);
+    --text:#f1f5ff;
+    --muted:#91a1bd;
+    --blue:#4385ff;
+    --cyan:#25d5ed;
+    --green:#25d99a;
+    --red:#ff637e;
+    --orange:#ffb454;
+    --purple:#a78bfa;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+    font-family:'DM Sans',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    overflow-x:hidden;
+}
+
+button,input,select{font:inherit}
+button{cursor:pointer}
+
+body:before{
+    content:"";
+    position:fixed;
+    width:650px;height:650px;
+    background:radial-gradient(circle,rgba(48,111,255,.15),transparent 70%);
+    top:-300px;right:-150px;
+    pointer-events:none;
+    animation:floatGlow 10s infinite alternate;
+}
+
+body:after{
+    content:"";
+    position:fixed;
+    width:500px;height:500px;
+    background:radial-gradient(circle,rgba(37,213,237,.09),transparent 70%);
+    bottom:-300px;left:-150px;
+    pointer-events:none;
+    animation:floatGlow 12s infinite alternate-reverse;
+}
+
+@keyframes floatGlow{
+    from{transform:translate(0,0)}
+    to{transform:translate(-80px,60px)}
+}
+
+.login-screen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:25px;
+    position:relative;
+    overflow:hidden;
+}
+
+.login-card{
+    width:100%;
+    max-width:440px;
+    padding:42px;
+    background:rgba(17,29,52,.88);
+    border:1px solid var(--border);
+    border-radius:25px;
+    box-shadow:0 30px 100px rgba(0,0,0,.45);
+    backdrop-filter:blur(20px);
+    animation:appear .7s ease;
+    z-index:2;
+}
+
+@keyframes appear{
+    from{opacity:0;transform:translateY(25px)}
+    to{opacity:1;transform:translateY(0)}
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-family:Manrope,sans-serif;
+    font-size:23px;
+    font-weight:800;
+}
+
+.logo-icon{
+    width:47px;height:47px;
+    border-radius:14px;
+    display:grid;place-items:center;
+    background:linear-gradient(135deg,#3479ff,#23c9e8);
+    box-shadow:0 8px 25px rgba(52,121,255,.35);
+}
+
+.login-card h1{
+    font-family:Manrope,sans-serif;
+    font-size:27px;
+    margin-top:35px;
+}
+
+.login-card p{color:var(--muted);margin:9px 0 28px}
+
+.field{margin-bottom:18px}
+.field label{
+    display:block;
+    font-size:13px;
+    color:#b9c6dd;
+    margin-bottom:8px;
+}
+
+.field input,.field select{
+    width:100%;
+    padding:14px 15px;
+    background:#0b172c;
+    border:1px solid var(--border);
+    border-radius:11px;
+    color:white;
+    outline:none;
+    transition:.25s;
+}
+
+.field input:focus,.field select:focus{
+    border-color:var(--blue);
+    box-shadow:0 0 0 3px rgba(67,133,255,.13);
+}
+
+.primary-btn{
+    width:100%;
+    padding:14px;
+    border:0;
+    border-radius:11px;
+    background:linear-gradient(110deg,#367bff,#27c8e5);
+    color:white;
+    font-weight:800;
+    transition:.3s;
+    box-shadow:0 8px 25px rgba(54,123,255,.2);
+}
+
+.primary-btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 12px 35px rgba(54,123,255,.4);
+}
+
+.login-error{color:#ff8194;font-size:13px;margin-top:12px}
+
+.app{display:none;min-height:100vh;position:relative;z-index:1}
+
+.sidebar{
+    width:255px;
+    position:fixed;
+    inset:0 auto 0 0;
+    background:rgba(12,23,43,.96);
+    border-right:1px solid var(--border);
+    padding:25px 17px;
+    z-index:20;
+    display:flex;
+    flex-direction:column;
+    transition:.3s;
+}
+
+.sidebar .logo{padding:0 8px 32px;font-size:20px}
+
+.nav-label{
+    color:#637693;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:1.7px;
+    padding:15px 12px 9px;
+}
+
+.nav-item{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    padding:13px 14px;
+    margin:3px 0;
+    color:#9eacc5;
+    border-radius:11px;
+    cursor:pointer;
+    transition:.25s;
+    font-size:13px;
+    font-weight:600;
+}
+
+.nav-item i{width:18px;text-align:center;font-size:15px}
+
+.nav-item:hover{
+    color:white;
+    background:rgba(67,133,255,.12);
+    transform:translateX(3px);
+}
+
+.nav-item.active{
+    color:white;
+    background:linear-gradient(100deg,rgba(67,133,255,.28),rgba(37,213,237,.08));
+    box-shadow:inset 3px 0 #4385ff;
+}
+
+.sidebar-bottom{margin-top:auto}
+
+.admin-mini{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:14px 8px;
+    border-top:1px solid var(--border);
+}
+
+.avatar{
+    width:38px;height:38px;
+    border-radius:12px;
+    display:grid;place-items:center;
+    background:linear-gradient(135deg,#4385ff,#9b7cff);
+    font-weight:800;
+}
+
+.admin-mini small{color:var(--muted);display:block;margin-top:3px}
+
+.main{
+    margin-left:255px;
+    padding:28px 34px 45px;
+    min-height:100vh;
+}
+
+.topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+    margin-bottom:30px;
+}
+
+.topbar h1{
+    font-family:Manrope,sans-serif;
+    font-size:25px;
+    font-weight:800;
+}
+
+.topbar p{color:var(--muted);font-size:13px;margin-top:5px}
+
+.top-actions{display:flex;gap:12px;align-items:center}
+
+.icon-btn{
+    width:42px;height:42px;
+    border:1px solid var(--border);
+    background:var(--panel);
+    color:white;
+    border-radius:12px;
+    display:grid;place-items:center;
+}
+
+.page{display:none;animation:pageIn .4s ease}
+.page.active{display:block}
+
+@keyframes pageIn{
+    from{opacity:0;transform:translateY(12px)}
+    to{opacity:1;transform:translateY(0)}
+}
+
+.welcome{
+    background:linear-gradient(110deg,#174a9c,#176e9a 65%,#1c8b9a);
+    border-radius:20px;
+    padding:28px 30px;
+    margin-bottom:25px;
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 15px 40px rgba(0,100,200,.15);
+}
+
+.welcome:after{
+    content:"🚆";
+    position:absolute;
+    right:45px;
+    top:5px;
+    font-size:100px;
+    opacity:.13;
+    transform:rotate(-8deg);
+    animation:trainMove 5s ease-in-out infinite alternate;
+}
+
+@keyframes trainMove{
+    from{transform:translateX(0) rotate(-8deg)}
+    to{transform:translateX(-25px) rotate(-8deg)}
+}
+
+.welcome h2{font:800 23px Manrope;margin-bottom:7px}
+.welcome p{font-size:13px;color:#d6eaff}
+
+.section-heading{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin:27px 0 16px;
+}
+
+.section-heading h2{font:800 17px Manrope}
+.section-heading span{color:var(--muted);font-size:12px}
+
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:17px;
+}
+
+.stat-card{
+    background:linear-gradient(145deg,#14233e,#101b30);
+    border:1px solid var(--border);
+    padding:21px;
+    border-radius:17px;
+    transition:.3s;
+    position:relative;
+    overflow:hidden;
+}
+
+.stat-card:hover{
+    transform:translateY(-6px);
+    border-color:rgba(67,133,255,.4);
+    box-shadow:0 15px 35px rgba(0,0,0,.2);
+}
+
+.stat-top{display:flex;justify-content:space-between;align-items:center}
+
+.stat-icon{
+    width:43px;height:43px;
+    border-radius:13px;
+    display:grid;place-items:center;
+    font-size:17px;
+}
+
+.blue{background:rgba(67,133,255,.15);color:#6ca2ff}
+.green{background:rgba(37,217,154,.14);color:#38dfa9}
+.orange{background:rgba(255,180,84,.14);color:#ffbd68}
+.purple{background:rgba(167,139,250,.15);color:#b69cff}
+.red{background:rgba(255,99,126,.14);color:#ff8197}
+
+.stat-card h3{
+    font:800 29px Manrope;
+    margin-top:20px;
+}
+
+.stat-card p{color:var(--muted);font-size:12px;margin-top:5px}
+
+.content-grid{
+    display:grid;
+    grid-template-columns:1.5fr 1fr;
+    gap:17px;
+    margin-top:18px;
+}
+
+.panel{
+    background:linear-gradient(145deg,#14233e,#101b30);
+    border:1px solid var(--border);
+    border-radius:17px;
+    padding:21px;
+    min-width:0;
+}
+
+.panel-title{
+    font:700 15px Manrope;
+    margin-bottom:20px;
+    display:flex;
+    justify-content:space-between;
+}
+
+.chart-box{height:260px;position:relative}
+
+.table-wrap{
+    overflow-x:auto;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:15px;
+}
+
+table{width:100%;border-collapse:collapse;min-width:650px}
+
+th{
+    text-align:left;
+    padding:15px 17px;
+    font-size:11px;
+    color:#8295b4;
+    text-transform:uppercase;
+    letter-spacing:.8px;
+    background:rgba(255,255,255,.025);
+}
+
+td{
+    padding:15px 17px;
+    border-top:1px solid var(--border);
+    font-size:12px;
+    color:#dce6f7;
+}
+
+tbody tr{transition:.2s}
+tbody tr:hover{background:rgba(67,133,255,.06)}
+
+.badge{
+    display:inline-block;
+    padding:6px 10px;
+    border-radius:20px;
+    font-size:10px;
+    font-weight:800;
+}
+
+.confirmed{background:rgba(37,217,154,.12);color:#3de1a9}
+.waiting{background:rgba(255,180,84,.12);color:#ffc16e}
+.rac{background:rgba(167,139,250,.15);color:#c1aaff}
+.cancelled{background:rgba(255,99,126,.12);color:#ff8498}
+.pending{background:rgba(255,180,84,.12);color:#ffc16e}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:17px;
+}
+
+.form-card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:17px;
+    padding:24px;
+    max-width:900px;
+}
+
+.form-card h3{font:800 17px Manrope;margin-bottom:22px}
+
+.form-card .field select option{background:#101b30}
+
+.form-actions{display:flex;gap:12px;margin-top:8px}
+
+.action-btn{
+    border:0;
+    padding:12px 18px;
+    background:linear-gradient(110deg,#367bff,#27c8e5);
+    color:white;
+    border-radius:10px;
+    font-weight:700;
+    font-size:12px;
+    transition:.2s;
+}
+
+.action-btn:hover{transform:translateY(-2px);filter:brightness(1.12)}
+
+.secondary-btn{
+    border:1px solid var(--border);
+    background:#192944;
+    color:#dce6f7;
+    padding:12px 17px;
+    border-radius:10px;
+    font-size:12px;
+}
+
+.payment-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    margin-bottom:20px;
+}
+
+.payment-option{
+    border:1px solid var(--border);
+    background:#0d192e;
+    border-radius:13px;
+    padding:15px 9px;
+    text-align:center;
+    color:#b8c7df;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.payment-option i{font-size:23px;display:block;margin-bottom:9px}
+.payment-option strong{font-size:11px}
+.payment-option.selected{
+    border-color:#4385ff;
+    background:rgba(67,133,255,.13);
+    color:white;
+    box-shadow:0 0 0 2px rgba(67,133,255,.1);
+}
+
+.search-row{display:flex;gap:12px;max-width:650px}
+.search-row input{
+    flex:1;
+    min-width:0;
+    background:#0b172c;
+    color:white;
+    border:1px solid var(--border);
+    padding:13px 15px;
+    border-radius:10px;
+    outline:none;
+}
+
+.result-card{
+    margin-top:20px;
+    padding:22px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:15px;
+    display:none;
+    max-width:750px;
+}
+
+.result-card.show{display:block;animation:appear .35s}
+
+.result-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:17px;
+    margin-top:20px;
+}
+
+.result-grid small{color:var(--muted);display:block;margin-bottom:5px}
+.result-grid strong{font-size:13px}
+
+.payment-symbol{
+    width:35px;height:25px;
+    display:inline-grid;place-items:center;
+    border-radius:5px;
+    background:#263b5e;
+    color:white;
+    font-size:11px;
+    font-weight:900;
+}
+
+.notice{
+    padding:14px 16px;
+    background:rgba(67,133,255,.1);
+    border:1px solid rgba(67,133,255,.2);
+    border-radius:11px;
+    color:#b8d1ff;
+    font-size:12px;
+    margin:15px 0;
+}
+
+.toast{
+    position:fixed;
+    right:25px;
+    bottom:25px;
+    background:#172b48;
+    border:1px solid var(--border);
+    padding:15px 20px;
+    border-radius:12px;
+    box-shadow:0 15px 40px #0008;
+    z-index:100;
+    opacity:0;
+    transform:translateY(20px);
+    pointer-events:none;
+    transition:.3s;
+    font-size:13px;
+}
+
+.toast.show{opacity:1;transform:translateY(0)}
+
+.mobile-menu{display:none}
+
+.empty{
+    text-align:center;
+    padding:35px;
+    color:var(--muted);
+}
+
+@media(max-width:1100px){
+    .stats-grid{grid-template-columns:repeat(2,1fr)}
+    .content-grid{grid-template-columns:1fr}
+}
+
+@media(max-width:750px){
+    .sidebar{transform:translateX(-100%)}
+    .sidebar.open{transform:translateX(0)}
+    .main{margin-left:0;padding:20px 15px}
+    .mobile-menu{display:grid}
+    .topbar h1{font-size:20px}
+    .stats-grid{gap:10px}
+    .stat-card{padding:15px}
+    .stat-card h3{font-size:23px}
+    .form-grid{grid-template-columns:1fr}
+    .payment-grid{grid-template-columns:repeat(2,1fr)}
+    .welcome:after{right:5px;font-size:70px}
+    .result-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<section class="login-screen" id="loginScreen">
+    <div class="login-card">
+        <div class="logo">
+            <div class="logo-icon"><i class="fa-solid fa-train"></i></div>
+            <span>Rail<span style="color:#42baff">Connect</span></span>
+        </div>
+
+        <h1>Welcome Back</h1>
+        <p>Sign in to access the railway administration panel.</p>
+
+        <div class="field">
+            <label>Administrator Username</label>
+            <input id="username" placeholder="Enter username">
+        </div>
+
+        <div class="field">
+            <label>Password</label>
+            <input id="password" type="password" placeholder="Enter password">
+        </div>
+
+        <button class="primary-btn" onclick="login()">
+            Sign In <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <div class="login-error" id="loginError"></div>
+    </div>
+</section>
+
+<!-- APPLICATION -->
+<div class="app" id="app">
+
+<aside class="sidebar" id="sidebar">
+    <div class="logo">
+        <div class="logo-icon"><i class="fa-solid fa-train"></i></div>
+        <span>Rail<span style="color:#42baff">Connect</span></span>
+    </div>
+
+    <div class="nav-label">MAIN MENU</div>
+
+    <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard',this)">
+        <i class="fa-solid fa-chart-pie"></i> Dashboard
+    </div>
+
+    <div class="nav-item" data-page="passengers" onclick="showPage('passengers',this)">
+        <i class="fa-solid fa-users"></i> Passengers
+    </div>
+
+    <div class="nav-item" data-page="register" onclick="showPage('register',this)">
+        <i class="fa-solid fa-user-plus"></i> Add Passenger
+    </div>
+
+    <div class="nav-item" data-page="booking" onclick="showPage('booking',this)">
+        <i class="fa-solid fa-ticket"></i> Book Ticket
+    </div>
+
+    <div class="nav-item" data-page="pnr" onclick="showPage('pnr',this)">
+        <i class="fa-solid fa-magnifying-glass"></i> PNR & Ticket
+    </div>
+
+    <div class="nav-item" data-page="cancel" onclick="showPage('cancel',this)">
+        <i class="fa-solid fa-ban"></i> Cancellation
+    </div>
+
+    <div class="nav-label">MANAGEMENT</div>
+
+    <div class="nav-item" data-page="cash" onclick="showPage('cash',this)">
+        <i class="fa-solid fa-money-bill-transfer"></i> Cash Verification
+    </div>
+
+    <div class="nav-item" data-page="coaches" onclick="showPage('coaches',this)">
+        <i class="fa-solid fa-train-subway"></i> Coaches
+    </div>
+
+    <div class="nav-item" data-page="history" onclick="showPage('history',this)">
+        <i class="fa-solid fa-clock-rotate-left"></i> Booking History
+    </div>
+
+    <div class="nav-item" data-page="reports" onclick="showPage('reports',this)">
+        <i class="fa-solid fa-chart-column"></i> Reports
+    </div>
+
+    <div class="sidebar-bottom">
+        <div class="admin-mini">
+            <div class="avatar">A</div>
+            <div>
+                <strong>Administrator</strong>
+                <small>System Manager</small>
+            </div>
+        </div>
+
+        <div class="nav-item" onclick="logout()">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </div>
+    </div>
+</aside>
+
+<main class="main">
+
+<header class="topbar">
+    <div style="display:flex;align-items:center;gap:13px">
+        <button class="icon-btn mobile-menu" onclick="toggleSidebar()">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <div>
+            <h1 id="pageTitle">Dashboard</h1>
+            <p id="currentDate">Railway Reservation Management System</p>
+        </div>
+    </div>
+
+    <div class="top-actions">
+        <button class="icon-btn" onclick="refreshCurrentPage()" title="Refresh">
+            <i class="fa-solid fa-rotate"></i>
+        </button>
+        <button class="icon-btn" onclick="logout()" title="Logout">
+            <i class="fa-solid fa-power-off"></i>
+        </button>
+    </div>
+</header>
+
+<!-- DASHBOARD -->
+<section class="page active" id="dashboard">
+
+    <div class="welcome">
+        <h2>Welcome to RailConnect</h2>
+        <p>Manage reservations, passengers, payments and railway operations from one place.</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-top">
+                <span style="color:var(--muted);font-size:12px">Total Passengers</span>
+                <div class="stat-icon blue"><i class="fa-solid fa-users"></i></div>
+            </div>
+            <h3 id="totalPassengers">0</h3>
+            <p>Registered passenger records</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <span style="color:var(--muted);font-size:12px">Confirmed Tickets</span>
+                <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+            </div>
+            <h3 id="confirmedTickets">0</h3>
+            <p>Successfully confirmed</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <span style="color:var(--muted);font-size:12px">Waiting / RAC</span>
+                <div class="stat-icon orange"><i class="fa-solid fa-hourglass-half"></i></div>
+            </div>
+            <h3 id="waitingTickets">0</h3>
+            <p id="racCount">RAC: 0</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <span style="color:var(--muted);font-size:12px">Total Revenue</span>
+                <div class="stat-icon purple"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+            </div>
+            <h3 id="totalRevenue">₹0</h3>
+            <p>Recorded booking revenue</p>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="panel">
+            <div class="panel-title">
+                Reservation Overview
+                <span style="color:var(--muted);font-size:11px">Live database figures</span>
+            </div>
+            <div class="chart-box"><canvas id="bookingChart"></canvas></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Booking Status</div>
+            <div class="chart-box"><canvas id="statusChart"></canvas></div>
+        </div>
+    </div>
+
+    <div class="section-heading">
+        <h2>Recent Passengers</h2>
+        <span>Latest passenger records</span>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Passenger</th>
+                    <th>PNR</th>
+                    <th>Coach</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="recentTable">
+                <tr><td colspan="5" class="empty">Loading records...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- PASSENGERS -->
+<section class="page" id="passengers">
+    <div class="section-heading">
+        <h2>Passenger Records</h2>
+        <span>Search and manage passengers</span>
+    </div>
+
+    <div class="search-row" style="margin-bottom:20px">
+        <input id="passengerSearch" placeholder="Search by name, ID or PNR..." oninput="loadPassengers()">
+        <button class="action-btn" onclick="loadPassengers()"><i class="fa fa-search"></i> Search</button>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th><th>Name</th><th>Age</th><th>PNR</th>
+                    <th>Coach</th><th>Seat</th><th>Status</th><th>Fare</th>
+                </tr>
+            </thead>
+            <tbody id="passengerTable">
+                <tr><td colspan="8" class="empty">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- REGISTER -->
+<section class="page" id="register">
+    <div class="form-card">
+        <h3><i class="fa-solid fa-user-plus" style="color:#4385ff"></i> Register New Passenger</h3>
+
+        <form id="registerForm">
+            <div class="form-grid">
+                <div class="field">
+                    <label>Passenger Full Name</label>
+                    <input name="name" required maxlength="49" placeholder="Enter full name">
+                </div>
+
+                <div class="field">
+                    <label>Age</label>
+                    <input name="age" type="number" min="1" max="120" required placeholder="Enter age">
+                </div>
+
+                <div class="field">
+                    <label>Coach Preference</label>
+                    <select name="coachType" required>
+                        <option value="0">A1 - AC First Class</option>
+                        <option value="1">B1 - AC 2 Tier</option>
+                        <option value="2">C1 - AC 3 Tier</option>
+                        <option value="3">S1 - Sleeper</option>
+                        <option value="4">D1 - Chair Car</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Priority Category</label>
+                    <select name="priority">
+                        <option value="0">Normal</option>
+                        <option value="1">Priority</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="notice">
+                <i class="fa-solid fa-circle-info"></i>
+                Passenger details will be saved in the railway database.
+            </div>
+
+            <button class="action-btn" type="submit">
+                <i class="fa-solid fa-plus"></i> Register Passenger
+            </button>
+        </form>
+    </div>
+</section>
+
+<!-- BOOKING -->
+<section class="page" id="booking">
+    <div class="form-card">
+        <h3><i class="fa-solid fa-ticket" style="color:#4385ff"></i> Book Railway Ticket</h3>
+
+        <form id="bookingForm">
+            <div class="field">
+                <label>Passenger ID</label>
+                <input name="passenger_id" type="number" required placeholder="Enter registered passenger ID">
+            </div>
+
+            <div class="field">
+                <label>Select Payment Method</label>
+            </div>
+
+            <div class="payment-grid">
+                <div class="payment-option selected" data-method="1" onclick="selectPayment(this)">
+                    <i class="fa-solid fa-money-bill-wave" style="color:#3ddca3"></i>
+                    <strong>Cash</strong>
+                </div>
+
+                <div class="payment-option" data-method="2" onclick="selectPayment(this)">
+                    <i class="fa-solid fa-mobile-screen-button" style="color:#5c9cff"></i>
+                    <strong>UPI</strong>
+                </div>
+
+                <div class="payment-option" data-method="2" onclick="selectPayment(this)">
+                    <span class="payment-symbol">GPay</span>
+                    <strong>Google Pay</strong>
+                </div>
+
+                <div class="payment-option" data-method="2" onclick="selectPayment(this)">
+                    <span class="payment-symbol">Pe</span>
+                    <strong>PhonePe</strong>
+                </div>
+
+                <div class="payment-option" data-method="2" onclick="selectPayment(this)">
+                    <span class="payment-symbol">Paytm</span>
+                    <strong>Paytm</strong>
+                </div>
+
+                <div class="payment-option" data-method="3" onclick="selectPayment(this)">
+                    <i class="fa-regular fa-credit-card" style="color:#65a4ff"></i>
+                    <strong>Debit Card</strong>
+                </div>
+
+                <div class="payment-option" data-method="4" onclick="selectPayment(this)">
+                    <i class="fa-solid fa-credit-card" style="color:#b69cff"></i>
+                    <strong>Credit Card</strong>
+                </div>
+
+                <div class="payment-option" data-method="5" onclick="selectPayment(this)">
+                    <i class="fa-solid fa-building-columns" style="color:#ffb454"></i>
+                    <strong>Net Banking</strong>
+                </div>
+            </div>
+
+            <input type="hidden" name="payment_method" id="paymentMethod" value="1">
+
+            <div class="notice">
+                <i class="fa-solid fa-shield-halved"></i>
+                Payment options are simulated for this academic project. No real payment is processed.
+                Cash bookings require admin verification.
+            </div>
+
+            <button class="action-btn" type="submit">
+                <i class="fa-solid fa-check"></i> Confirm Booking
+            </button>
+        </form>
+
+        <div id="bookingResult" class="result-card"></div>
+    </div>
+</section>
+
+<!-- PNR -->
+<section class="page" id="pnr">
+    <div class="panel">
+        <div class="panel-title">PNR Status & Ticket Search</div>
+
+        <div class="search-row">
+            <input id="pnrInput" type="number" placeholder="Enter your 10-digit PNR">
+            <button class="action-btn" onclick="searchPNR()">
+                <i class="fa-solid fa-search"></i> Search
+            </button>
+        </div>
+
+        <div id="pnrResult" class="result-card"></div>
+    </div>
+</section>
+
+<!-- CANCELLATION -->
+<section class="page" id="cancel">
+    <div class="form-card">
+        <h3><i class="fa-solid fa-ban" style="color:#ff637e"></i> Cancel Reservation</h3>
+
+        <div class="field">
+            <label>Enter PNR Number</label>
+            <input id="cancelPNR" type="number" placeholder="Enter booking PNR">
+        </div>
+
+        <button class="action-btn" onclick="cancelBooking()">
+            <i class="fa-solid fa-trash"></i> Cancel Ticket
+        </button>
+
+        <div id="cancelResult" class="result-card"></div>
+    </div>
+</section>
+
+<!-- CASH -->
+<section class="page" id="cash">
+    <div class="section-heading">
+        <h2>Cash Payment Verification</h2>
+        <span>Confirm cash received from passengers</span>
+    </div>
+
+    <div class="notice">
+        Cash payments remain pending until the administrator confirms receipt.
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Passenger ID</th><th>Name</th><th>PNR</th>
+                    <th>Fare</th><th>Status</th><th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="cashTable">
+                <tr><td colspan="6" class="empty">Cash verification requires the backend cash API.</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <button class="action-btn" style="margin-top:15px" onclick="loadCash()">
+        <i class="fa-solid fa-rotate"></i> Refresh Payments
+    </button>
+</section>
+
+<!-- COACHES -->
+<section class="page" id="coaches">
+    <div class="section-heading">
+        <h2>Coach Availability</h2>
+        <span>Seat allocation overview</span>
+    </div>
+
+    <div class="stats-grid" id="coachGrid">
+        <div class="panel">Loading coach information...</div>
+    </div>
+</section>
+
+<!-- HISTORY -->
+<section class="page" id="history">
+    <div class="section-heading"><h2>Booking History</h2></div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Date</th><th>Passenger</th><th>PNR</th><th>Event</th><th>Details</th></tr>
+            </thead>
+            <tbody id="historyTable">
+                <tr><td colspan="5" class="empty">Loading history...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- REPORTS -->
+<section class="page" id="reports">
+    <div class="section-heading">
+        <h2>Reports & Analytics</h2>
+        <span>Reservation activity</span>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="fa-solid fa-check"></i></div>
+            <h3 id="reportConfirmed">0</h3>
+            <p>Confirmed Bookings</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon red"><i class="fa-solid fa-xmark"></i></div>
+            <h3 id="reportCancelled">0</h3>
+            <p>Cancelled Bookings</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon orange"><i class="fa-solid fa-clock"></i></div>
+            <h3 id="reportWaiting">0</h3>
+            <p>Waiting List</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon purple"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+            <h3 id="reportRevenue">₹0</h3>
+            <p>Recorded Revenue</p>
+        </div>
+    </div>
+
+    <div class="panel" style="margin-top:20px">
+        <div class="panel-title">System Activity Report</div>
+        <div class="chart-box"><canvas id="reportChart"></canvas></div>
+    </div>
+
+    <button class="action-btn" style="margin-top:18px" onclick="exportPassengers()">
+        <i class="fa-solid fa-file-csv"></i> Export Passenger CSV
+    </button>
+</section>
+
+</main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let bookingChart=null;
+let statusChart=null;
+let reportChart=null;
+
+const coachNames=[
+    "A1 - AC First Class",
+    "B1 - AC 2 Tier",
+    "C1 - AC 3 Tier",
+    "S1 - Sleeper",
+    "D1 - Chair Car"
+];
+
+function toast(message){
+    const el=document.getElementById("toast");
+    el.textContent=message;
+    el.classList.add("show");
+    setTimeout(()=>el.classList.remove("show"),3000);
+}
+
+function login(){
+    const username=document.getElementById("username").value.trim();
+    const password=document.getElementById("password").value;
+
+    // Demo-only login. Replace with Flask session authentication
+    // before deploying the application.
+    if(username==="admin" && password==="Railway@123"){
+        sessionStorage.setItem("railconnect_admin_demo","true");
+        openApp();
+    }else{
+        document.getElementById("loginError").textContent="Invalid username or password.";
+    }
+}
+
+function openApp(){
+    document.getElementById("loginScreen").style.display="none";
+    document.getElementById("app").style.display="block";
+    document.getElementById("currentDate").textContent=
+        new Date().toLocaleDateString("en-IN",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+    loadDashboard();
+}
+
+function logout(){
+    sessionStorage.removeItem("railconnect_admin_demo");
+    location.reload();
+}
+
+function showPage(page,element){
+    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+    document.getElementById(page).classList.add("active");
+
+    document.querySelectorAll(".nav-item[data-page]").forEach(n=>n.classList.remove("active"));
+    if(element)element.classList.add("active");
+
+    const titles={
+        dashboard:"Dashboard",passengers:"Passengers",register:"Add Passenger",
+        booking:"Book Ticket",pnr:"PNR & Ticket",cancel:"Cancellation",
+        cash:"Cash Verification",coaches:"Coach Availability",
+        history:"Booking History",reports:"Reports & Analytics"
+    };
+
+    document.getElementById("pageTitle").textContent=titles[page]||"Dashboard";
+
+    if(page==="dashboard")loadDashboard();
+    if(page==="passengers")loadPassengers();
+    if(page==="history")loadHistory();
+    if(page==="reports")loadReports();
+    if(page==="coaches")loadCoaches();
+    if(page==="cash")loadCash();
+
+    document.getElementById("sidebar").classList.remove("open");
+}
+
+function toggleSidebar(){
+    document.getElementById("sidebar").classList.toggle("open");
+}
+
+async function api(url,options={}){
+    const response=await fetch(url,{
+        headers:{"Content-Type":"application/json"},
+        ...options
+    });
+
+    let data;
+    try{data=await response.json()}catch(e){data={error:"Invalid server response"}}
+
+    if(!response.ok)throw new Error(data.error||data.message||"Request failed");
+    return data;
+}
+
+function statusClass(status){
+    if(status===1)return "confirmed";
+    if(status===2)return "waiting";
+    if(status===3)return "rac";
+    return "cancelled";
+}
+
+function statusName(status){
+    return ({0:"Cancelled",1:"Confirmed",2:"Waiting",3:"RAC"})[status]||"Unknown";
+}
+
+function money(value){
+    return "₹"+Number(value||0).toLocaleString("en-IN");
+}
+
+function coachName(value){
+    return coachNames[value]||"Not Assigned";
+}
+
+async function loadDashboard(){
+    try{
+        const d=await api("/api/dashboard");
+
+        document.getElementById("totalPassengers").textContent=d.total??0;
+        document.getElementById("confirmedTickets").textContent=d.confirmed??0;
+        document.getElementById("waitingTickets").textContent=(d.waiting??0)+(d.rac??0);
+        document.getElementById("racCount").textContent="RAC: "+(d.rac??0);
+        document.getElementById("totalRevenue").textContent=money(d.revenue);
+
+        makeCharts(d);
+
+        const passengers=await api("/api/passengers");
+        const rows=Array.isArray(passengers)?passengers:(passengers.passengers||[]);
+
+        document.getElementById("recentTable").innerHTML=rows.slice(-5).reverse().map(p=>`
+            <tr>
+                <td>${p.id??"-"}</td>
+                <td>${escapeHTML(p.name)}</td>
+                <td>${p.pnr||"-"}</td>
+                <td>${escapeHTML(coachName(p.coachType))}</td>
+                <td><span class="badge ${statusClass(p.status)}">${statusName(p.status)}</span></td>
+            </tr>
+        `).join("")||'<tr><td colspan="5" class="empty">No passenger records found.</td></tr>';
+
+    }catch(e){toast(e.message)}
+}
+
+function makeCharts(d){
+    if(bookingChart)bookingChart.destroy();
+    if(statusChart)statusChart.destroy();
+
+    const common={
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:"#a9bad4",boxWidth:10,font:{size:11}}}}
+    };
+
+    bookingChart=new Chart(document.getElementById("bookingChart"),{
+        type:"bar",
+        data:{
+            labels:["Confirmed","Waiting","RAC","Cancelled"],
+            datasets:[{
+                label:"Reservations",
+                data:[d.confirmed||0,d.waiting||0,d.rac||0,d.cancelled||0],
+                backgroundColor:["#25d99a","#ffb454","#a78bfa","#ff637e"],
+                borderRadius:7
+            }]
+        },
+        options:{
+            ...common,
+            scales:{
+                x:{ticks:{color:"#9aacc7"},grid:{display:false}},
+                y:{ticks:{color:"#9aacc7"},grid:{color:"rgba(255,255,255,.06)"}}
+            }
+        }
+    });
+
+    statusChart=new Chart(document.getElementById("statusChart"),{
+        type:"doughnut",
+        data:{
+            labels:["Confirmed","Waiting","RAC","Cancelled"],
+            datasets:[{
+                data:[d.confirmed||0,d.waiting||0,d.rac||0,d.cancelled||0],
+                backgroundColor:["#25d99a","#ffb454","#a78bfa","#ff637e"],
+                borderWidth:0,
+                hoverOffset:9
+            }]
+        },
+        options:{...common,cutout:"72%"}
+    });
+}
+
+async function loadPassengers(){
+    try{
+        const q=document.getElementById("passengerSearch")?.value||"";
+        const d=await api("/api/passengers?q="+encodeURIComponent(q));
+        const rows=Array.isArray(d)?d:(d.passengers||[]);
+
+        document.getElementById("passengerTable").innerHTML=rows.map(p=>`
+            <tr>
+                <td>${p.id}</td>
+                <td>${escapeHTML(p.name)}</td>
+                <td>${p.age??"-"}</td>
+                <td>${p.pnr||"-"}</td>
+                <td>${escapeHTML(coachName(p.coachType))}</td>
+                <td>${p.seatNo>=0?p.seatNo:"-"}</td>
+                <td><span class="badge ${statusClass(p.status)}">${statusName(p.status)}</span></td>
+                <td>${money(p.ticketPrice)}</td>
+            </tr>
+        `).join("")||'<tr><td colspan="8" class="empty">No passengers found.</td></tr>';
+    }catch(e){toast(e.message)}
+}
+
+document.getElementById("registerForm").addEventListener("submit",async function(e){
+    e.preventDefault();
+    const f=new FormData(this);
+
+    try{
+        const d=await api("/api/register",{
+            method:"POST",
+            body:JSON.stringify({
+                name:f.get("name"),
+                age:Number(f.get("age")),
+                priority:Number(f.get("priority")),
+                coachType:Number(f.get("coachType"))
+            })
+        });
+
+        toast(d.message||"Passenger registered successfully.");
+        this.reset();
+        loadDashboard();
+    }catch(e){toast(e.message)}
+});
+
+function selectPayment(element){
+    document.querySelectorAll(".payment-option").forEach(p=>p.classList.remove("selected"));
+    element.classList.add("selected");
+    document.getElementById("paymentMethod").value=element.dataset.method;
+}
+
+document.getElementById("bookingForm").addEventListener("submit",async function(e){
+    e.preventDefault();
+    const f=new FormData(this);
+
+    try{
+        const d=await api("/api/book",{
+            method:"POST",
+            body:JSON.stringify({
+                passenger_id:Number(f.get("passenger_id")),
+                payment_method:Number(document.getElementById("paymentMethod").value)
+            })
+        });
+
+        const result=document.getElementById("bookingResult");
+        result.classList.add("show");
+        result.innerHTML=`
+            <h3 style="color:#42dfa8">Booking Request Processed</h3>
+            <div class="result-grid">
+                <div><small>PNR Number</small><strong>${d.pnr||"Not generated"}</strong></div>
+                <div><small>Booking Status</small><strong>${escapeHTML(d.status||"Processed")}</strong></div>
+                <div><small>Fare</small><strong>${money(d.fare||d.ticketPrice)}</strong></div>
+            </div>
+            ${d.pnr?`<button class="action-btn" style="margin-top:20px" onclick="window.open('/ticket/${encodeURIComponent(d.pnr)}','_blank')">View Ticket</button>`:""}
+        `;
+
+        toast(d.message||"Booking processed.");
+        loadDashboard();
+    }catch(e){toast(e.message)}
+});
+
+async function searchPNR(){
+    const pnr=document.getElementById("pnrInput").value;
+    if(!pnr)return toast("Please enter a PNR number.");
+
+    try{
+        const p=await api("/api/pnr/"+encodeURIComponent(pnr));
+        const r=document.getElementById("pnrResult");
+        r.classList.add("show");
+
+        r.innerHTML=`
+            <h3>Reservation Details</h3>
+            <div class="result-grid">
+                <div><small>Passenger</small><strong>${escapeHTML(p.name)}</strong></div>
+                <div><small>PNR</small><strong>${p.pnr}</strong></div>
+                <div><small>Age</small><strong>${p.age}</strong></div>
+                <div><small>Coach</small><strong>${escapeHTML(coachName(p.coachType))}</strong></div>
+                <div><small>Seat Number</small><strong>${p.seatNo>=0?p.seatNo:"Not Allocated"}</strong></div>
+                <div><small>Status</small><strong class="${statusClass(p.status)}">${statusName(p.status)}</strong></div>
+                <div><small>Fare</small><strong>${money(p.ticketPrice)}</strong></div>
+                <div><small>Payment Status</small><strong>${p.paymentStatus?"Paid":"Pending"}</strong></div>
+            </div>
+            <button class="action-btn" style="margin-top:22px" onclick="window.open('/ticket/${encodeURIComponent(p.pnr)}','_blank')">
+                <i class="fa-solid fa-file-ticket"></i> View / Print Ticket
+            </button>
+        `;
+    }catch(e){toast(e.message)}
+}
+
+async function cancelBooking(){
+    const pnr=document.getElementById("cancelPNR").value;
+    if(!pnr)return toast("Enter a PNR number.");
+    if(!confirm("Are you sure you want to cancel this reservation?"))return;
+
+    try{
+        const d=await api("/api/cancel",{
+            method:"POST",
+            body:JSON.stringify({pnr:Number(pnr)})
+        });
+
+        const r=document.getElementById("cancelResult");
+        r.classList.add("show");
+        r.innerHTML=`
+            <h3 style="color:#3de1a9">Cancellation Processed</h3>
+            <p style="margin-top:12px">Refund amount: <strong>${money(d.refund)}</strong></p>
+        `;
+
+        toast(d.message||"Ticket cancelled.");
+        loadDashboard();
+    }catch(e){toast(e.message)}
+}
+
+async function loadCash(){
+    const table=document.getElementById("cashTable");
+    try{
+        const d=await api("/api/cash/pending");
+        const rows=Array.isArray(d)?d:(d.passengers||[]);
+
+        table.innerHTML=rows.map(p=>`
+            <tr>
+                <td>${p.id}</td>
+                <td>${escapeHTML(p.name)}</td>
+                <td>${p.pnr}</td>
+                <td>${money(p.ticketPrice)}</td>
+                <td><span class="badge pending">Pending</span></td>
+                <td><button class="action-btn" onclick="verifyCash(${p.pnr})">Verify Cash</button></td>
+            </tr>
+        `).join("")||'<tr><td colspan="6" class="empty">No pending cash payments.</td></tr>';
+    }catch(e){
+        table.innerHTML='<tr><td colspan="6" class="empty">Cash verification API is not yet connected to the backend.</td></tr>';
+    }
+}
+
+async function verifyCash(pnr){
+    if(!confirm("Confirm that cash has been received for PNR "+pnr+"?"))return;
+
+    try{
+        const d=await api("/api/cash/verify",{
+            method:"POST",
+            body:JSON.stringify({pnr:Number(pnr)})
+        });
+        toast(d.message||"Cash payment verified.");
+        loadCash();
+        loadDashboard();
+    }catch(e){toast(e.message)}
+}
+
+async function loadCoaches(){
+    try{
+        const d=await api("/api/coaches");
+        const rows=Array.isArray(d)?d:(d.coaches||[]);
+
+        document.getElementById("coachGrid").innerHTML=rows.map((c,i)=>{
+            const total=c.totalSeats??c.total??0;
+            const booked=c.bookedSeats??c.booked??0;
+            const available=c.availableSeats??c.available??0;
+            const percent=total?Math.round(booked/total*100):0;
+
+            return `
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <span style="font-size:13px;font-weight:800">${escapeHTML(c.name||coachName(i))}</span>
+                        <div class="stat-icon blue"><i class="fa-solid fa-train"></i></div>
+                    </div>
+                    <h3>${available}</h3>
+                    <p>Available seats out of ${total}</p>
+                    <div style="height:7px;background:#263650;border-radius:10px;margin-top:17px;overflow:hidden">
+                        <div style="height:100%;width:${percent}%;background:linear-gradient(90deg,#4385ff,#25d5ed);border-radius:10px"></div>
+                    </div>
+                    <small style="display:block;margin-top:9px;color:var(--muted)">${booked} seats occupied</small>
+                </div>
+            `;
+        }).join("")||'<div class="panel">No coach information available.</div>';
+    }catch(e){toast(e.message)}
+}
+
+async function loadHistory(){
+    try{
+        const d=await api("/api/history");
+        const rows=Array.isArray(d)?d:(d.history||[]);
+
+        document.getElementById("historyTable").innerHTML=rows.map(h=>`
+            <tr>
+                <td>${escapeHTML(h.created_at||h.date||"-")}</td>
+                <td>${escapeHTML(h.name||"-")}</td>
+                <td>${h.pnr||"-"}</td>
+                <td>${escapeHTML(h.event_type||h.event||"-")}</td>
+                <td>${escapeHTML(h.details||"-")}</td>
+            </tr>
+        `).join("")||'<tr><td colspan="5" class="empty">No booking history available.</td></tr>';
+    }catch(e){toast(e.message)}
+}
+
+async function loadReports(){
+    try{
+        const d=await api("/api/dashboard");
+        document.getElementById("reportConfirmed").textContent=d.confirmed??0;
+        document.getElementById("reportCancelled").textContent=d.cancelled??0;
+        document.getElementById("reportWaiting").textContent=(d.waiting??0)+(d.rac??0);
+        document.getElementById("reportRevenue").textContent=money(d.revenue);
+
+        const r=await api("/api/reports");
+        const rows=Array.isArray(r)?r:(r.reports||[]);
+        if(reportChart)reportChart.destroy();
+
+        reportChart=new Chart(document.getElementById("reportChart"),{
+            type:"bar",
+            data:{
+                labels:rows.map(x=>x.event_type||x.event||"Event"),
+                datasets:[{
+                    label:"Activity",
+                    data:rows.map(x=>x.count||0),
+                    backgroundColor:"#4385ff",
+                    borderRadius:6
+                }]
+            },
+            options:{
+                responsive:true,maintainAspectRatio:false,
+                plugins:{legend:{labels:{color:"#a9bad4"}}},
+                scales:{
+                    x:{ticks:{color:"#a9bad4"},grid:{display:false}},
+                    y:{ticks:{color:"#a9bad4"},grid:{color:"rgba(255,255,255,.06)"}}
+                }
+            }
+        });
+    }catch(e){toast(e.message)}
+}
+
+async function exportPassengers(){
+    try{
+        const d=await api("/api/passengers");
+        const rows=Array.isArray(d)?d:(d.passengers||[]);
+        if(!rows.length)return toast("No passenger records to export.");
+
+        const columns=["id","name","age","pnr","coachType","seatNo","status","ticketPrice"];
+        const csv=[
+            columns.join(","),
+            ...rows.map(r=>columns.map(k=>JSON.stringify(r[k]??"")).join(","))
+        ].join("\n");
+
+        const blob=new Blob([csv],{type:"text/csv"});
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement("a");
+        a.href=url;a.download="RailConnect_Passengers.csv";a.click();
+        URL.revokeObjectURL(url);
+    }catch(e){toast(e.message)}
+}
+
+function refreshCurrentPage(){
+    const page=document.querySelector(".page.active")?.id||"dashboard";
+    const nav=document.querySelector(`.nav-item[data-page="${page}"]`);
+    showPage(page,nav);
+    toast("Data refreshed.");
+}
+
+function escapeHTML(value){
+    return String(value??"").replace(/[&<>"']/g,c=>({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    })[c]);
+}
+
+if(sessionStorage.getItem("railconnect_admin_demo")==="true"){
+    openApp();
+}
+</script>
+
+</body>
+</html>
